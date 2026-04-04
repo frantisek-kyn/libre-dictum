@@ -1,0 +1,13 @@
+{
+  "model_name": "turbo",
+  "silence_seconds": 1.0,
+  "max_chunk_seconds": 30.0,
+  "energy_threshold": 0.01,
+  "pre_roll_seconds": 0.25,
+	"lang": "en",
+	"paste_shortcut": "ctrl + v",
+	"command_prefix": "command",
+	"commands": {
+		"open terminal": "alt + enter"
+	}
+}
