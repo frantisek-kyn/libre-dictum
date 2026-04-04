@@ -2,8 +2,11 @@ import json
 
 class Config:
     def __init__(self, path):
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            data = {}
 
         self.model_name = data.get("model_name", "base")
         self.silence_seconds = data.get("silence_seconds", 1.0)
