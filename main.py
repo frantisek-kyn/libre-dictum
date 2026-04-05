@@ -17,7 +17,7 @@ if __name__ == "__main__":
         if split_text[0].lower() == cfg.dictate_prefix:
             copied_text = ' '.join(split_text[1:])
             capitalized = copied_text[0].upper() + copied_text[1:]
-            print("Dictated: {capitalized}")
+            print(f"Dictated: {capitalized}")
             pyperclip.copy(capitalized)
             print(f"Executing: {cfg.paste_shortcut}")
             handle_input(cfg.paste_shortcut, input_delay = cfg.input_delay)
