@@ -5,8 +5,8 @@ from collections import deque
 import numpy as np
 import pyperclip
 import sounddevice as sd
-import whisper
 
+from model import Model
 
 class WhisperStream:
     def __init__(
@@ -21,7 +21,7 @@ class WhisperStream:
         chunk_callback=None,
         lang = "en"
     ):
-        self.model = whisper.load_model(model_name)
+        self.model = Model(model_name)
         self.sample_rate = sample_rate
         self.block_duration = block_duration
         self.silence_seconds = silence_seconds
@@ -151,7 +151,9 @@ class WhisperStream:
     def _transcribe_audio(self, audio: np.ndarray) -> str:
         if audio.size == 0:
             return ""
-        result = self.model.transcribe(audio, fp16=False, language=self.lang)
+        result = self.model.transcribe(audio, language=self.lang)
+        if isinstance(result, list):
+            return result[0]
         return result.get("text", "")
 
 if __name__ == "__main__":
