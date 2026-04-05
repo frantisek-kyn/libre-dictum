@@ -14,7 +14,7 @@ if __name__ == "__main__":
     def callback(text):
         print(f"Obtained: {text}")
         split_text = text.split()
-        if split_text[0].lower() == cfg.dictate_prefix:
+        if split_text[0].lower() == cfg.dictate_prefix and len(split_text) > 1:
             copied_text = ' '.join(split_text[1:])
             capitalized = copied_text[0].upper() + copied_text[1:]
             print(f"Dictated: {capitalized}")
