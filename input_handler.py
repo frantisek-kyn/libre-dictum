@@ -79,6 +79,8 @@ def replace_number_words(text: str) -> str:
 def handle_input(text, input_delay = 0.01):
     ui = UInput()
     data = text.replace(" ", "").lower().split("+")
+    if not all(char in char_map for char in data):
+        return
     for char in data:
         if char not in char_map:
             raise Exception(f"{char} is not valid key")

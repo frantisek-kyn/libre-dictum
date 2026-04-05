@@ -5,8 +5,9 @@
 	"energy_threshold": 0.01,
 	"pre_roll_seconds": 0.25,
 	"lang": "en",
-	"paste_shortcut": "ctrl + v",
+	"paste_shortcut": "ctrl  + shift + v",
 	"input_delay": 0.01,
+	"dictate_prefix": "say",
 	"commands": {
 		"open terminal": "alt + enter",
 		"test number {numeric}": "a + {1} + b",

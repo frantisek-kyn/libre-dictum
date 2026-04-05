@@ -6,14 +6,25 @@ import json
 import re
 
 from input_handler import handle_input, expand_command, replace_number_words
+import pyperclip
 
 if __name__ == "__main__":
     cfg = Config("config.json")
     
     def callback(text):
-        command = ' '.join(text.split()).lower().strip()
+        print(f"Obtained: {text}") 
+        split_text = text.split()
+        if split_text[0].lower() == cfg.dictate_prefix:
+            copied_text = ' '.join(split_text[1:])
+            capitalized = copied_text[0].upper() + copied_text[1:]
+            print("Dictated: {capitalized}")
+            pyperclip.copy(capitalized)
+            print(f"Executing: {cfg.paste_shortcut}")
+            handle_input(cfg.paste_shortcut, input_delay = cfg.input_delay)
+            return
+
+        command = ' '.join(split_text).lower().strip()
         clean_command = replace_number_words(re.sub(r'[?.!;:]', '', command))
-    
         for pattern, response in cfg.commands.items():
             pattern_clean = re.sub(r'[?.!;:]', '', pattern.lower().strip())
     
@@ -26,10 +37,10 @@ if __name__ == "__main__":
             match = re.fullmatch(regex, clean_command)
             if match:
                 expanded_command = expand_command(response, match.groups())
+                print(f"Executing: {expanded_command}")
                 handle_input(expanded_command, input_delay = cfg.input_delay)
                 break
 
-        print(text) 
     ws = WhisperStream(
             model_name = cfg.model_name,
             silence_seconds = cfg.silence_seconds,
