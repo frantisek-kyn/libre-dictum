@@ -56,5 +56,5 @@ if __name__ == "__main__":
     print(json.dumps(cfg.__dict__, indent=2))
     ws.start()
     input("Press Enter to stop\n")
-    record = ws.end()
+    # record = ws.end()
     #print(record)

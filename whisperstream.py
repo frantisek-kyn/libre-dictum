@@ -30,7 +30,7 @@ class WhisperStream:
         self.pre_roll_seconds = pre_roll_seconds
         self.chunk_callback = chunk_callback
 
-        self._audio_q = queue.Queue()
+        self._audio_q = queue.SimpleQueue()
         self._stop_event = threading.Event()
         self._worker = None
         self._stream = None
