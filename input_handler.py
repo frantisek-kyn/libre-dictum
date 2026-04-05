@@ -76,8 +76,21 @@ pattern = re.compile(r"\b(" + "|".join(num_words) + r")\b")
 def replace_number_words(text: str) -> str:
     return pattern.sub(lambda m: num_words[m.group(0)], text)
 
+def expand_repeats(text: str) -> str:
+    pattern = re.compile(r"(\d+)\(([^()]*)\)")
+
+    while True:
+        new_text = pattern.sub(
+                lambda m: "+".join(m.group(2) * int(m.group(1))),
+                text
+            )
+        if new_text == text:
+            return text
+        text = new_text
+
 def handle_input(text, input_delay = 0.01):
     ui = UInput()
+    text = expand_repeats(text)
     data = text.replace(" ", "").lower().split("+")
     if not all(char in char_map for char in data):
         return

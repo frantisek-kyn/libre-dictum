@@ -11,7 +11,7 @@
 	"reload_command": "reload config",
 	"commands": {
 		"open terminal": "alt + enter",
-		"test number {numeric}": "a + {1} + a",
+		"press {any} {numeric} times": "{2}({1})",
 		"press {any}": "{1}"
 	}
 }
