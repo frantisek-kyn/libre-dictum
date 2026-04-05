@@ -5,22 +5,31 @@ from whisperstream import WhisperStream
 import json
 import re
 
-from input_handler import handle_input
+from input_handler import handle_input, expand_command, replace_number_words
 
 if __name__ == "__main__":
     cfg = Config("config.json")
     
     def callback(text):
-        splitted = text.split( )
-        if True:#splitted[0].lower() == cfg.command_prefix:
-            command = ' '.join(splitted[0:]).lower().strip()
-            clean_command = re.sub('[?.!;:]', "", command)
-            if clean_command in cfg.commands:
-                handle_input(cfg.commands[clean_command])
-
-        print(text)
-
+        command = ' '.join(text.split()).lower().strip()
+        clean_command = replace_number_words(re.sub(r'[?.!;:]', '', command))
     
+        for pattern, response in cfg.commands.items():
+            pattern_clean = re.sub(r'[?.!;:]', '', pattern.lower().strip())
+    
+            # Replace {numeric} with (\d+), {any} with (\S+)
+            regex = re.escape(pattern_clean)
+            regex = regex.replace(r"\{numeric\}", r"(\d+)")
+            regex = regex.replace(r"\{any\}", r"(\S+)")  # matches any non-space string
+            regex = "^" + regex + "$"
+    
+            match = re.fullmatch(regex, clean_command)
+            if match:
+                expanded_command = expand_command(response, match.groups())
+                handle_input(expanded_command, input_delay = cfg.input_delay)
+                break
+
+        print(text) 
     ws = WhisperStream(
             model_name = cfg.model_name,
             silence_seconds = cfg.silence_seconds,

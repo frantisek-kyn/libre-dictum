@@ -1,5 +1,6 @@
 from evdev import UInput, ecodes as e
 import time
+import re
 
 char_map = {
     # Alphabet
@@ -42,7 +43,40 @@ holdable_keys = ["shift", "ctrl", "alt", "meta", "win"]
 
 keys_held = []
 
-def handle_input(text):
+def expand_command(response_template, values):
+    """
+    Replaces placeholders {1}, {2}, ... in response_template with corresponding values.
+    
+    :param response_template: str, e.g., "a + {1} + {2}"
+    :param values: tuple/list of str, e.g., ("9", "5")
+    :return: str with placeholders replaced, e.g., "a + 9 + 5"
+    """
+    result = response_template
+    for i, value in enumerate(values, start=1):
+        result = result.replace(f"{{{i}}}", value)
+    return result
+
+
+num_words = {
+    "zero": "0",
+    "one": "1",
+    "two": "2",
+    "three": "3",
+    "four": "4",
+    "five": "5",
+    "six": "6",
+    "seven": "7",
+    "eight": "8",
+    "nine": "9",
+    "ten": "10",
+}
+
+pattern = re.compile(r"\b(" + "|".join(num_words) + r")\b")
+
+def replace_number_words(text: str) -> str:
+    return pattern.sub(lambda m: num_words[m.group(0)], text)
+
+def handle_input(text, input_delay = 0.01):
     ui = UInput()
     data = text.replace(" ", "").lower().split("+")
     for char in data:
@@ -51,7 +85,7 @@ def handle_input(text):
         key = char_map[char]
         ui.write(e.EV_KEY, key, 1)
         ui.syn()
-        time.sleep(0.03)
+        time.sleep(input_delay)
 
         if char in holdable_keys:
             keys_held.append(key)
@@ -59,12 +93,13 @@ def handle_input(text):
         
         ui.write(e.EV_KEY, key, 0)
         ui.syn()
-        time.sleep(0.03)
+        time.sleep(input_delay)
 
-        for hold_key in keys_held:
-            ui.write(e.EV_KEY, hold_key, 0)
-        ui.syn()
-        time.sleep(0.03)
+        if len(keys_held) != 0:
+            for hold_key in keys_held:
+                ui.write(e.EV_KEY, hold_key, 0)
+            ui.syn()
+            time.sleep(input_delay)
     ui.close()
 
 if __name__ == "__main__":

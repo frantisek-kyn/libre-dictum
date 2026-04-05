@@ -1,12 +1,15 @@
 {
-  "model_name": "turbo",
-  "silence_seconds": 1.0,
-  "max_chunk_seconds": 30.0,
-  "energy_threshold": 0.01,
-  "pre_roll_seconds": 0.25,
+	"model_name": "turbo",
+	"silence_seconds": 1.0,
+	"max_chunk_seconds": 30.0,
+	"energy_threshold": 0.01,
+	"pre_roll_seconds": 0.25,
 	"lang": "en",
 	"paste_shortcut": "ctrl + v",
+	"input_delay": 0.01,
 	"commands": {
-		"open terminal": "alt + enter"
+		"open terminal": "alt + enter",
+		"test number {numeric}": "a + {1} + b",
+		"press {any}": "{1}"
 	}
 }
