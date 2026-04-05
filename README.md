@@ -5,7 +5,7 @@
 # Features
 
 * **Direct Kernel-Level Input**: `python-evdev` injects keystrokes directly into the input subsystem, ensuring compatibility across all GUI and TTY environments.
-* **Local Processing**: Whisper v3 Turbo for quick private transcription.
+* **Local Processing**: Whisper turbo for quick private transcription.
 * **Configurability**: Command structure is fully customizable. 
 
 # Installation
