@@ -1,6 +1,6 @@
 from config import Config
 
-from stt import WhisperStream
+from whisperstream import WhisperStream
 
 import json
 import re
