@@ -1,6 +1,6 @@
 # Overview
 
- A minimalist accessibility tool for GNU/Linux. It bridges local Whisper-based speech recognition with kernel-level input simulation. This bypasses limitations of specific window managers or desktop environments.
+ A minimalist accessibility tool for GNU/Linux. It bridges local speech recognition with kernel-level input simulation. This bypasses limitations of specific window managers or desktop environments.
 
 # Features
 
