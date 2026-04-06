@@ -1,16 +1,15 @@
-from transformers import AutoProcessor, AutoModelForSpeechSeq2Seq
-
-import whisper
 
 class Model():
     def __init__(self, name):
         splitted = name.split("-")
         self.whisper = False
         if splitted[0] == "whisper":
+            import whisper
             self.name = '-'.join(splitted[1:])
             self.model = whisper.load_model(self.name)
             self.whisper = True
         else:
+            from transformers import AutoProcessor, AutoModelForSpeechSeq2Seq
             self.name = name
             self.model = AutoModelForSpeechSeq2Seq.from_pretrained(name, device_map="auto")
             self.processor = AutoProcessor.from_pretrained(name)

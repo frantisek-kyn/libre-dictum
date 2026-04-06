@@ -1,17 +1,18 @@
 {
 	"model_name": "whisper-turbo",
-	"silence_seconds": 1.0,
+	"silence_seconds": 0.3,
 	"max_chunk_seconds": 30.0,
 	"energy_threshold": 0.01,
 	"pre_roll_seconds": 0.25,
 	"lang": "en",
-	"paste_shortcut": "ctrl  + shift + v",
 	"input_delay": 0.01,
-	"dictate_prefix": "say",
 	"reload_command": "reload config",
+	"transformer_device": "auto",
 	"commands": {
 		"open terminal": "alt + enter",
 		"press {any} {numeric} times": "{2}({1})",
-		"press {any}": "{1}"
+		"press {any}": "{1}",
+		"dictate {rest}": "python(import pyperclip\npyperclip.copy('{1}')) + ctrl + shift + v",
+		"open firefox": "exec(firefox)"
 	}
 }

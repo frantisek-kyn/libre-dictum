@@ -14,15 +14,6 @@ if __name__ == "__main__":
     def callback(text):
         print(f"Obtained: {text}")
         split_text = text.split()
-        if split_text[0].lower() == cfg.dictate_prefix and len(split_text) > 1:
-            copied_text = ' '.join(split_text[1:])
-            capitalized = copied_text[0].upper() + copied_text[1:]
-            print(f"Dictated: {capitalized}")
-            pyperclip.copy(capitalized)
-            print(f"Executing: {cfg.paste_shortcut}")
-            handle_input(cfg.paste_shortcut, input_delay = cfg.input_delay)
-            return
-
         command = ' '.join(split_text).lower().strip()
         clean_command = replace_number_words(re.sub(r'[?.!;:]', '', command))
         if clean_command == cfg.reload_command:
@@ -35,6 +26,7 @@ if __name__ == "__main__":
             regex = re.escape(pattern_clean)
             regex = regex.replace(r"\{numeric\}", r"(\d+)")
             regex = regex.replace(r"\{any\}", r"(\S+)")  # matches any non-space string
+            regex = regex.replace(r"\{rest\}", r"(.+)")  # matches any non-space string
             regex = "^" + regex + "$"
     
             match = re.fullmatch(regex, clean_command)

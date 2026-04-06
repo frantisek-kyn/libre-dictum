@@ -19,8 +19,6 @@ class Config:
         self.pre_roll_seconds = data.get("pre_roll_seconds", 0.25)
         self.lang = data.get("lang", "en")
         self.input_delay = data.get("input_delay", 0.01)
-        self.paste_shortcut = data.get("paste_shortcut", "ctrl + shift + v")
-        self.dictate_prefix = data.get("dictate_prefix", "say")
         self.reload_command = data.get("reload_command", "reload config")
         self.commands = data.get("commands", {})
 

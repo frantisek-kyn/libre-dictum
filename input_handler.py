@@ -1,6 +1,7 @@
 from evdev import UInput, ecodes as e
 import time
 import re
+import subprocess
 
 char_map = {
     # Alphabet
@@ -90,14 +91,38 @@ def expand_repeats(text: str) -> str:
 
 ui = UInput()
 
+exec_regex = r"exec\((.*)\)"
+
+def handle_exec(text):
+    match = re.fullmatch(exec_regex, text, re.DOTALL)
+    if not match:
+        return False
+    captured = match.group(1)
+    subprocess.run(captured.split(" "))
+    return True
+
+python_regex = r"python\((.*)\)"
+
+def handle_python(text):
+    match = re.fullmatch(python_regex, text, re.DOTALL)
+    if not match:
+        return False
+    captured = match.group(1)
+    exec(captured)
+    return True
+
+
 def handle_input(text, input_delay = 0.01):
     text = expand_repeats(text)
-    data = text.replace(" ", "").lower().split("+")
-    if not all(char in char_map for char in data):
+    data = [x.strip() for x in text.split("+")]
+    if not all(char.lower() in char_map or re.fullmatch(exec_regex, char, re.DOTALL) or re.fullmatch(python_regex, char, re.DOTALL) for char in data):
         return
     for char in data:
-        if char not in char_map:
-            raise Exception(f"{char} is not valid key")
+        if handle_python(char):
+            continue
+        if handle_exec(char):
+            continue
+        char = char.lower()
         key = char_map[char]
         ui.write(e.EV_KEY, key, 1)
         ui.syn()
