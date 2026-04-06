@@ -5,18 +5,20 @@ import threading
 import sounddevice as sd
 from vosk import Model, KaldiRecognizer
 
+import re
+
 class VoskStream:
-    def __init__(self, commands_dict, model_path="model", sample_rate=16000, chunk_callback=None):
+    def __init__(self, command_keys, other_words = [], model_path="model", sample_rate=16000, chunk_callback=None):
         self.sample_rate = sample_rate
         self.chunk_callback = chunk_callback
         self.last_word = None
         
         self.model = Model(model_path)
         
-        vocabulary = list(commands_dict.keys())
-        print(vocabulary)
-        self.keys = list(commands_dict.keys())
-        vocabulary.extend(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "[unk]"])
+        self.keys = list(command_keys)
+        vocabulary = list(command_keys)
+        vocabulary.extend(other_words)
+        vocabulary.extend(["[unk]"])
         grammar = json.dumps(vocabulary)
         
         self.recognizer = KaldiRecognizer(self.model, self.sample_rate, grammar)
@@ -41,6 +43,19 @@ class VoskStream:
 
         self._worker = threading.Thread(target=self._transcribe_loop, daemon=True)
         self._worker.start()
+
+    def _match_pattern(self, partial_text):
+        for template in self.keys:
+            # Escape all regex characters except for {} placeholders
+            regex_pattern = re.escape(template)
+            # Replace escaped {} placeholders with regex to match anything
+            regex_pattern = re.sub(r'\\\{.*?\\\}', r'(.+?)', regex_pattern)
+            regex_pattern += r'$'
+            # Match at the end of the string
+            match = re.search(regex_pattern, partial_text)
+            if match:
+                return match.group(0)  # Full matched portion
+        return None
 
     def _transcribe_loop(self):
         while not self._stop_event.is_set():
@@ -68,10 +83,11 @@ class VoskStream:
                     self.recognizer.Reset()
                     continue
                 
-                if partial_text in self.keys:
+                regex_match = self._match_pattern(partial_text)
+                if regex_match:
                     self.last_word = partial_text.split(" ")[-1]
                     if self.chunk_callback:
-                        self.chunk_callback(partial_text)
+                        self.chunk_callback(regex_match)
                     self.recognizer.Reset()
                 else:
                     print(partial_text)

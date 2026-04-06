@@ -6,7 +6,7 @@ from voskstream import VoskStream
 import json
 import re
 
-from input_handler import handle_input, expand_command, replace_number_words
+from input_handler import handle_input, expand_command, replace_number_words, char_map
 import pyperclip
 
 if __name__ == "__main__":
@@ -47,7 +47,8 @@ if __name__ == "__main__":
             chunk_callback = callback
         )
     vosk = VoskStream(
-        commands_dict = cfg.commands,
+        command_keys = list(cfg.commands.keys()),
+        other_words = list(char_map.keys()),
         model_path = "models/vosk-model-small-en-us-0.15", # Default Vosk local model directory
         chunk_callback = callback
     )
