@@ -46,7 +46,7 @@ class VoskStream:
         self._worker.start()
 
     def _match_pattern(self, partial_text):
-        for template in self.keys:
+        for template in reversed(self.keys):
             # Escape all regex characters except for {} placeholders
             regex_pattern = re.escape(template)
             # Replace escaped {} placeholders with regex to match anything
