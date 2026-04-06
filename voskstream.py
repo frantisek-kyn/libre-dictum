@@ -14,10 +14,12 @@ class VoskStream:
         self.last_word = None
         
         self.model = Model(model_path)
+        self.enabled = False
         
         self.keys = list(command_keys)
         vocabulary = list(command_keys)
-        vocabulary.extend(other_words)
+        if other_words:
+            vocabulary.extend(other_words)
         vocabulary.extend(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"])
         vocabulary.extend(["[unk]"])
         grammar = json.dumps(vocabulary)
@@ -45,6 +47,12 @@ class VoskStream:
         self._worker = threading.Thread(target=self._transcribe_loop, daemon=True)
         self._worker.start()
 
+    def enable(self):
+        self.enabled = True
+
+    def disable(self):
+        self.enabled = False
+
     def _match_pattern(self, partial_text):
         for template in reversed(self.keys):
             # Escape all regex characters except for {} placeholders
@@ -63,6 +71,9 @@ class VoskStream:
             try:
                 block = self._audio_q.get(timeout=0.2)
             except queue.Empty:
+                continue
+
+            if not self.enabled:
                 continue
 
             if self.recognizer.AcceptWaveform(block):

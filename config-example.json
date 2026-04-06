@@ -1,18 +1,31 @@
 {
-	"model_name": "whisper-turbo",
-	"silence_seconds": 0.3,
-	"max_chunk_seconds": 30.0,
-	"energy_threshold": 0.01,
-	"pre_roll_seconds": 0.25,
-	"lang": "en",
-	"input_delay": 0.01,
 	"reload_command": "reload config",
-	"transformer_device": "auto",
-	"commands": {
-		"open terminal": "alt + enter",
-		"press {any} {numeric} times": "{2}({1})",
-		"press {any}": "{1}",
-		"dictate {rest}": "python(import pyperclip\npyperclip.copy('{1}')) + ctrl + shift + v",
-		"open firefox": "exec(firefox)"
+	"starting_mode": "root mode",
+	"modes": {
+		"root mode": {
+			"type": "vosk",
+			"path": "models/vosk-model-small-en-us-0.15",
+			"input_delay": 0.01,
+			"commands": {
+				"open terminal": "alt + enter",
+				"press {any}": "{1}",
+				"{numeric} times press {any} ": "{1}({2})",
+				"open firefox": "exec(firefox)"
+			}
+		},
+		"dictate mode": {
+			"type": "transformer",
+			"model_name": "whisper-turbo",
+			"silence_seconds": 0.3,
+			"max_chunk_seconds": 30.0,
+			"energy_threshold": 0.01,
+			"pre_roll_seconds": 0.25,
+			"lang": "en",
+			"input_delay": 0.01,
+			"transformer_device": "auto",
+			"commands": {
+				"{rest}": "python(import pyperclip\npyperclip.copy('{1}')) + ctrl + shift + v"
+			}
+		}
 	}
 }

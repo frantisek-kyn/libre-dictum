@@ -21,6 +21,7 @@ class WhisperStream:
         chunk_callback=None,
         lang = "en"
     ):
+        self.enabled = False
         self.model = Model(model_name)
         self.sample_rate = sample_rate
         self.block_duration = block_duration
@@ -73,6 +74,12 @@ class WhisperStream:
 
         return self.text.strip()
 
+    def enable(self):
+        self.enabled = True
+
+    def disable(self):
+        self.enabled = False
+
     def _rms(self, audio: np.ndarray) -> float:
         audio = np.asarray(audio, dtype=np.float32)
         if audio.size == 0:
@@ -92,6 +99,9 @@ class WhisperStream:
             try:
                 block = self._audio_q.get(timeout=0.2)
             except queue.Empty:
+                continue
+
+            if not self.enabled:
                 continue
 
             block = np.asarray(block, dtype=np.float32).reshape(-1)
