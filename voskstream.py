@@ -1,5 +1,6 @@
 import json
 import queue
+import time
 import threading
 import sounddevice as sd
 from vosk import Model, KaldiRecognizer
@@ -8,12 +9,14 @@ class VoskStream:
     def __init__(self, commands_dict, model_path="model", sample_rate=16000, chunk_callback=None):
         self.sample_rate = sample_rate
         self.chunk_callback = chunk_callback
+        self.last_word = None
         
         self.model = Model(model_path)
         
         vocabulary = list(commands_dict.keys())
-        vocabulary.extend(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"])
-        vocabulary.extend(["unk"])
+        print(vocabulary)
+        self.keys = list(commands_dict.keys())
+        vocabulary.extend(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "[unk]"])
         grammar = json.dumps(vocabulary)
         
         self.recognizer = KaldiRecognizer(self.model, self.sample_rate, grammar)
@@ -48,14 +51,27 @@ class VoskStream:
 
             if self.recognizer.AcceptWaveform(block):
                 result = json.loads(self.recognizer.Result())
-                text = result.get("text", "")
+                text = result.get("text", "").strip()
                 if text and self.chunk_callback:
                     self.chunk_callback(text)
             else:
                 partial_result = json.loads(self.recognizer.PartialResult())
-                partial_text = partial_result.get("partial", "")
+                partial_text = partial_result.get("partial", "").strip()
                 
-                if partial_text and self.chunk_callback:
-                    executed = self.chunk_callback(partial_text)
-                    if executed:
-                        self.recognizer.Reset()
+                if not partial_text:
+                    continue
+                if partial_text == self.last_word:
+                    self.recognizer.Reset()
+                    self.last_word = None
+
+                if "[unk]" in partial_text:
+                    self.recognizer.Reset()
+                    continue
+                
+                if partial_text in self.keys:
+                    self.last_word = partial_text.split(" ")[-1]
+                    if self.chunk_callback:
+                        self.chunk_callback(partial_text)
+                    self.recognizer.Reset()
+                else:
+                    print(partial_text)

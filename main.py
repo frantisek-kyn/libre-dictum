@@ -1,6 +1,7 @@
 from config import Config
 
 from whisperstream import WhisperStream
+from voskstream import VoskStream
 
 import json
 import re
@@ -45,8 +46,14 @@ if __name__ == "__main__":
             lang = cfg.lang,
             chunk_callback = callback
         )
+    vosk = VoskStream(
+        commands_dict = cfg.commands,
+        model_path = "models/vosk-model-small-en-us-0.15", # Default Vosk local model directory
+        chunk_callback = callback
+    )
+
     print(json.dumps(cfg.__dict__, indent=2))
-    ws.start()
+    vosk.start()
     input("Press Enter to stop\n")
     # record = ws.end()
     #print(record)
