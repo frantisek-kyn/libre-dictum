@@ -7,6 +7,7 @@
 * **Direct Kernel-Level Input**: `python-evdev` injects keystrokes directly into the input subsystem, ensuring compatibility across all GUI and TTY environments.
 * **Local Processing**: Relies purely on local models.
 * **Hybrid Transcription**: Rapid TDNN + HMM + WFST models with grammar (e.g., VOSK) for commands, transformer models (e.g., whisper-turbo) for complex dictation.
+* **Mode Switching**: You can create different grammar sets for concurrent VOSK models to switch between for high transcription accuracy.
 * **Configurability**: Command structure is fully customizable. 
 
 # Installation
