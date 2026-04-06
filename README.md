@@ -32,5 +32,5 @@ Highly experimental and in development.
 
 Features to be implemented/polished:
 
-* Dual model implementation (e.g., VOSK for voice commands, arbitrary transformer model for sentence dictation)
-* vim/emacs-like major mode switching
+* Dual model implementation (e.g., VOSK for voice commands, arbitrary transformer model for sentence dictation).
+* vim/emacs-like major mode switching.
