@@ -135,7 +135,7 @@ combined_regex = re.compile(f"{script_regex}|{python_regex}|{exec_regex}", re.DO
 def handle_input(text, input_delay = 0.01, aliases = {}):
     text = apply_aliases(text, aliases)
     text = expand_repeats(text)
-    data = [x.strip() for x in text.split("+")]
+    data = [x.strip() for x in re.split(r"(?!\\)\+", text)]
     if not all(char.lower() in char_map or combined_regex.fullmatch(char) for char in data):
         return
     for char in data:
