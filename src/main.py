@@ -1,23 +1,22 @@
-from config import Config
+from .config import Config
 
-from whisperstream import WhisperStream
-from voskstream import VoskStream
+from .whisperstream import WhisperStream
+from .voskstream import VoskStream
 
 import json
 import re
 
-from input_handler import handle_input, expand_command, replace_number_words, char_map
+from .input_handler import handle_input, expand_command, replace_number_words, char_map
 import pyperclip
 
 import sys
 
-if __name__ == "__main__":
-
+def main():
     cfg = Config("config.json")
 
     tray_enabled = False
     if cfg.enable_systray:
-        from systray import RGBTrayIcon
+        from .systray import RGBTrayIcon
         tray = RGBTrayIcon("linux-voice-control")
         tray_enabled = True
    
@@ -86,5 +85,6 @@ if __name__ == "__main__":
             tray.show()
 
     input("Press Enter to stop\n")
-    # record = ws.end()
-    #print(record)
+
+if __name__ == "__main__":
+    main()

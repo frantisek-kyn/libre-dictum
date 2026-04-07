@@ -6,7 +6,7 @@ import numpy as np
 import pyperclip
 import sounddevice as sd
 
-from model import Model
+from .model import Model
 
 class WhisperStream:
     def __init__(

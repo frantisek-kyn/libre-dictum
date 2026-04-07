@@ -1,4 +1,5 @@
 import json
+import warnings
 
 class Config:
     def __init__(self, path):
@@ -10,6 +11,7 @@ class Config:
             with open(self.path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
         except FileNotFoundError:
+            warnings.warn(f"Configuration file '{self.path}' is missing. Using defaults.", UserWarning)
             data = {}
         self.reload_command = data.get("reload_command", "reload config")
         self.modes = data.get("modes", {})
