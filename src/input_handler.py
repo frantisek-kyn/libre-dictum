@@ -119,7 +119,7 @@ def handle_python(text):
 
 script_regex = r"script\((.*)\)"
 
-def handle_exec(text):
+def handle_script(text):
     match = re.fullmatch(script_regex, text, re.DOTALL)
     if not match:
         return False
@@ -139,6 +139,8 @@ def handle_input(text, input_delay = 0.01, aliases = {}):
     if not all(char.lower() in char_map or combined_regex.fullmatch(char) for char in data):
         return
     for char in data:
+        if handle_script(char):
+            continue
         if handle_python(char):
             continue
         if handle_exec(char):

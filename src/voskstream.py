@@ -17,10 +17,11 @@ class VoskStream:
         self.enabled = False
         
         self.keys = list(command_keys)
+        self.numbers = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"] 
         vocabulary = list(command_keys)
         if other_words:
             vocabulary.extend(other_words)
-        vocabulary.extend(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"])
+        vocabulary.extend(self.numbers)
         vocabulary.extend(["[unk]"])
         grammar = json.dumps(vocabulary)
         
@@ -55,15 +56,21 @@ class VoskStream:
 
     def _match_pattern(self, partial_text):
         for template in reversed(self.keys):
-            # Escape all regex characters except for {} placeholders
             regex_pattern = re.escape(template)
-            # Replace escaped {} placeholders with regex to match anything
-            regex_pattern = re.sub(r'\\\{.*?\\\}', r'(.+?)', regex_pattern)
+    
+            # {any} -> any non-whitespace sequence
+            regex_pattern = regex_pattern.replace(r'\{any\}', r'(\S+)')
+    
+            # {numeric} -> any value from self.numbers
+            if r'\{numeric\}' in regex_pattern:
+                numeric_pattern = r'(' + '|'.join(self.numbers) + r')'
+                regex_pattern = regex_pattern.replace(r'\{numeric\}', numeric_pattern)
+    
             regex_pattern += r'$'
-            # Match at the end of the string
+    
             match = re.search(regex_pattern, partial_text)
             if match:
-                return match.group(0)  # Full matched portion
+                return match.group(0)
         return None
 
     def _transcribe_loop(self):
