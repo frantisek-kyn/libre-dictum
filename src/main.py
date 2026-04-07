@@ -11,7 +11,10 @@ import pyperclip
 
 import sys
 
+active_mode = None
+
 def main():
+    global active_mode
     cfg = Config("config.json")
 
     tray_enabled = False
@@ -21,11 +24,12 @@ def main():
         tray_enabled = True
    
     active_mode = cfg.starting_mode
+    print(active_mode)
     modes = {}
      
     def callback(text):
-        print(f"Obtained: {text}")
         global active_mode
+        print(f"Obtained: {text}")
         split_text = text.split()
         command = ' '.join(split_text).lower().strip()
         clean_command = replace_number_words(re.sub(r'[?.!;:]', '', command))

@@ -12,7 +12,8 @@
 				"open terminal": "alt + enter",
 				"press {any}": "{1}",
 				"{numeric} times press {any} ": "{1}({2})",
-				"open firefox": "exec(firefox)"
+				"open firefox": "exec(firefox)",
+				"paste sentence": "script(copy;;Example text that I want in clipboard.) + ctrl + shift + v"
 			}
 		},
 		"dictate mode": {
@@ -27,7 +28,7 @@
 			"input_delay": 0.01,
 			"transformer_device": "auto",
 			"commands": {
-				"{rest}": "python(import pyperclip\npyperclip.copy('{1}')) + ctrl + shift + v"
+				"{rest}": "python(import pyperclip\npyperclip.copy(`{1}`)) + ctrl + shift + v"
 			}
 		}
 	}

@@ -2,6 +2,7 @@ from evdev import UInput, ecodes as e
 import time
 import re
 import subprocess
+import importlib
 
 char_map = {
     # Alphabet
@@ -111,11 +112,25 @@ def handle_python(text):
     exec(captured)
     return True
 
+script_regex = r"script\((.*)\)"
+
+def handle_exec(text):
+    match = re.fullmatch(script_regex, text, re.DOTALL)
+    if not match:
+        return False
+    captured = match.group(1)
+    arguments = captured.split(";;")
+    script_path = f"scripts.{arguments.pop(0)}"
+    script_function = getattr(importlib.import_module(script_path), "script")
+    script_function(*arguments)
+    return True
+
+combined_regex = re.compile(f"{script_regex}|{python_regex}|{exec_regex}", re.DOTALL)
 
 def handle_input(text, input_delay = 0.01):
     text = expand_repeats(text)
     data = [x.strip() for x in text.split("+")]
-    if not all(char.lower() in char_map or re.fullmatch(exec_regex, char, re.DOTALL) or re.fullmatch(python_regex, char, re.DOTALL) for char in data):
+    if not all(char.lower() in char_map or combined_regex.fullmatch(char) for char in data):
         return
     for char in data:
         if handle_python(char):
