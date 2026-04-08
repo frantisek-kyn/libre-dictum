@@ -33,9 +33,9 @@ def main():
         global active_mode
         print(f"Obtained: {text}")
         split_text = text.split()
-        command = ' '.join(split_text).lower().strip()
+        command = ' '.join(split_text).strip()
         clean_command = replace_number_words(re.sub(r'[?.!;:]', '', command))
-        if clean_command == cfg.reload_command:
+        if clean_command.lower() == cfg.reload_command:
             cfg.reload()
             print("Config Reloaded")
         if clean_command in modes:
