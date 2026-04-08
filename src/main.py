@@ -35,15 +35,20 @@ def main():
         split_text = text.split()
         command = ' '.join(split_text).strip()
         clean_command = replace_number_words(re.sub(r'[?.!;:]', '', command))
-        if clean_command.lower() == cfg.reload_command:
+        command_lower = clean_command.lower()
+        if command_lower == cfg.reload_command:
             cfg.reload()
             print("Config Reloaded")
-        if clean_command in modes:
+            return
+        if command_lower in modes:
             modes[active_mode].disable()
-            active_mode = clean_command
+            active_mode = command_lower
             if tray_enabled:
                 tray.set_mode(active_mode)
             modes[active_mode].enable()
+            return
+        if command_lower in cfg.modes[active_mode]["banned_strings"]:
+            print(f"Skipping: '{text}' = '{command_lower}'")
             return
         for pattern, response in cfg.modes[active_mode]["commands"].items():
             pattern_clean = re.sub(r'[?.!;:]', '', pattern.lower().strip())
