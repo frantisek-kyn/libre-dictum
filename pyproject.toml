@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "libre-dictum"
+version = "1.0.0"
+description = "Linux environment-agnostic fully customizable voice control software."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "AGPL-3.0-or-later" }
+authors = [
+  { name = "František Kýn" },
+	{ name = "Kristian Tichota" }
+]
+dependencies = [
+  "vosk",
+	"evdev",
+	"sounddevice",
+	"pyperclip",
+	"numpy"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+libre-dictum = "libre_dictum.main:main"
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.4.0",
+  "black>=24.0"
+]
+whisper = [
+	"openai-whisper"
+]
+transformers = [
+	"transformers",
+	"accelerate"
+]
+system-tray = [
+	"pystray",
+	"pillow",
+	"PyGObject"
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.black]
+line-length = 100
+target-version = ["py312+"]

@@ -1,5 +1,0 @@
-openai-whisper
-numpy
-sounddevice
-evdev
-pyperclip

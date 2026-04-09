@@ -6,6 +6,8 @@ import importlib
 
 import warnings
 
+import sys
+
 char_map = {
     # Alphabet
     'a': e.KEY_A, 'b': e.KEY_B, 'c': e.KEY_C, 'd': e.KEY_D,
@@ -80,6 +82,9 @@ num_words = {
     "ten": "10",
 }
 
+def append_script_path(path):
+    sys.path.append(path)
+
 pattern = re.compile(r"\b(" + "|".join(num_words) + r")\b")
 
 def replace_number_words(text: str) -> str:
@@ -134,7 +139,7 @@ def handle_script(text):
 
 combined_regex = re.compile(f"{script_regex}|{python_regex}|{exec_regex}", re.DOTALL)
 
-def handle_input(text, input_delay = 0.01, aliases = {}):
+def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None):
     text = apply_aliases(text, aliases)
     text = expand_repeats(text)
     data = [x.strip().replace(r"\+", "+") for x in re.split(r"(?<!\\)\+", text)]

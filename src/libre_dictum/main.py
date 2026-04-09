@@ -6,7 +6,7 @@ from .voskstream import VoskStream
 import json
 import re
 
-from .input_handler import handle_input, expand_command, replace_number_words, char_map
+from .input_handler import handle_input, expand_command, replace_number_words, char_map, append_script_path
 import pyperclip
 
 import sys
@@ -15,9 +15,12 @@ from .formatter import expand_numeric_placeholders
 
 active_mode = None
 
+from pathlib import Path
+
 def main():
     global active_mode
-    cfg = Config("config.json")
+    cfg = Config(Path.home() / ".config" / "libre-dictum")
+    append_script_path(str(cfg.path))
 
     tray_enabled = False
     if cfg.enable_systray:
@@ -86,7 +89,7 @@ def main():
                 )
         if tray_enabled:
             tray.add_mode(key, value["icon"])
-    print(json.dumps(cfg.__dict__, indent=2))
+    #print(json.dumps(cfg.__dict__, indent=2))
     for mode in modes.values():
         mode.start()
     if active_mode:

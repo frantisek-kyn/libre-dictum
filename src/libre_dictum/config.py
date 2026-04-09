@@ -3,6 +3,8 @@ import warnings
 from copy import deepcopy
 from typing import Any, Dict
 
+from pathlib import Path
+
 class Config:
     def __init__(self, path):
         self.path = path
@@ -63,13 +65,23 @@ class Config:
             imported_mode = self.modes[mode_key]
             self._import_mode(mode, imported_mode)
 
+    
+    def _create_config_dir(self) -> None:
+        self.script_path = self.path / "scripts"
+        self.config_path = self.path / "config.json"
+        if not (self.script_path.exists() and self.script_path.is_dir()):
+            # Function to create the directory
+            self.script_path.mkdir(parents=True, exist_ok=True)
 
     def reload(self) -> None:
+        self._create_config_dir()
         try:
-            with open(self.path, 'r', encoding='utf-8') as f:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
+            file_missing = False
         except FileNotFoundError:
-            warnings.warn(f"Configuration file '{self.path}' is missing. Using defaults.", UserWarning)
+            warnings.warn(f"Configuration file '{self.config_path}' is missing. Using defaults.", UserWarning)
+            file_missing = True
             data = {}
         self.reload_command = data.get("reload_command", "reload config")
         self.modes = data.get("modes", {})
