@@ -1,0 +1,60 @@
+Metadata-Version: 2.4
+Name: libre-dictum
+Version: 1.0.0
+Summary: Linux environment-agnostic fully customizable voice control software.
+Author: František Kýn, Kristian Tichota
+License: AGPL-3.0-or-later
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: vosk
+Requires-Dist: evdev
+Requires-Dist: sounddevice
+Requires-Dist: pyperclip
+Requires-Dist: numpy
+Provides-Extra: dev
+Requires-Dist: ruff>=0.4.0; extra == "dev"
+Requires-Dist: black>=24.0; extra == "dev"
+Provides-Extra: whisper
+Requires-Dist: openai-whisper; extra == "whisper"
+Provides-Extra: transformers
+Requires-Dist: transformers; extra == "transformers"
+Requires-Dist: accelerate; extra == "transformers"
+Provides-Extra: system-tray
+Requires-Dist: pystray; extra == "system-tray"
+Requires-Dist: pillow; extra == "system-tray"
+Requires-Dist: PyGObject; extra == "system-tray"
+Dynamic: license-file
+
+# Overview
+
+ A minimalist accessibility tool for GNU/Linux. It bridges local speech recognition with kernel-level input simulation. This bypasses limitations of specific window managers or desktop environments.
+
+# Features
+
+* **Direct Kernel-Level Input**: `python-evdev` injects keystrokes directly into the input subsystem, ensuring compatibility across all GUI and TTY environments.
+* **Local Processing**: Relies purely on local models.
+* **Hybrid Transcription**: Rapid TDNN + HMM + WFST models with grammar (e.g., VOSK) for commands, transformer models (e.g., whisper-turbo) for complex dictation.
+* **Mode Switching**: You can create different grammar sets for concurrent VOSK models to switch between for high transcription accuracy.
+* **Configurability**: Command structure is fully customizable. 
+
+# Installation
+The installation procedure differs based on your GPU vendor:
+
+### NVIDIA
+1. `pip install -r requirements.txt`
+
+### AMD
+1. `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.2`
+2. `pip install -r requirements.txt`
+
+And in the case that you would want to use only your CPU:
+
+1. `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
+2. `pip install -r requirements.txt`
+
+For additional information, visit the official [PyTorch installation guide](https://pytorch.org/get-started/locally/).
+
+# Status
+
+In rapid development; config structure is updated often. Currently functional and satisfies many use cases.

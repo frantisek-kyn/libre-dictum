@@ -1,0 +1,2 @@
+[console_scripts]
+libre-dictum = libre_dictum.main:main

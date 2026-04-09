@@ -8,7 +8,9 @@ version = "1.0.0"
 description = "Linux environment-agnostic fully customizable voice control software."
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "AGPL-3.0-or-later" }
+license = "AGPL-3.0-or-later"
+license-files = [ "LICENSE" ]
+
 authors = [
   { name = "František Kýn" },
 	{ name = "Kristian Tichota" }
