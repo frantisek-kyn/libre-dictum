@@ -46,6 +46,14 @@ system-tray = [
 	"pillow",
 	"PyGObject"
 ]
+all = [
+	"openai-whisper",
+	"transformers",
+	"accelerate",
+	"pystray",
+	"pillow",
+	"PyGObject"
+]
 
 [tool.ruff]
 line-length = 100
