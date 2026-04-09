@@ -2,31 +2,70 @@
 
  A minimalist accessibility tool for GNU/Linux. It bridges local speech recognition with kernel-level input simulation. This bypasses limitations of specific window managers or desktop environments.
 
-# Features
+## Features
 
-* **Direct Kernel-Level Input**: `python-evdev` injects keystrokes directly into the input subsystem, ensuring compatibility across all GUI and TTY environments.
+* **Direct Kernel-Level Input**: `python-evdev` injects keystrokes directly into the input subsystem, meaning it can work even in a TTY.
 * **Local Processing**: Relies purely on local models.
-* **Hybrid Transcription**: Rapid TDNN + HMM + WFST models with grammar (e.g., VOSK) for commands, transformer models (e.g., whisper-turbo) for complex dictation.
-* **Mode Switching**: You can create different grammar sets for concurrent VOSK models to switch between for high transcription accuracy.
-* **Configurability**: Command structure is fully customizable. 
+* **Hybrid Transcription**: Utilizes the VOSK models with grammar based on your commands and transformer models for dictation.
+* **Mode Switching**: You can switch between different configs on the fly via a voice command.
+* **Configurability**: Command structure is fully customizable.
+* **System Tray**: Provides live feedback on the current enabled voice mode.
+* **Script Execution**: You can execute your own scripts via voice commands.
 
-# Installation
-The installation procedure differs based on your GPU vendor:
+## Installation
+### 1. PyTorch
 
-### NVIDIA
-1. `pip install -r requirements.txt`
+The installation procedure differs based on your target hardware. For NVIDIA GPU, you can skip this step.
 
-### AMD
-1. `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.2`
-2. `pip install -r requirements.txt`
+### AMD GPU
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.2
+```
+### CPU
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+```
 
-And in the case that you would want to use only your CPU:
+For additional information concerning the PyTorch library, visit the official [PyTorch installation guide](https://pytorch.org/get-started/locally/).
 
-1. `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
-2. `pip install -r requirements.txt`
+### 2. Libre Dictum
 
-For additional information, visit the official [PyTorch installation guide](https://pytorch.org/get-started/locally/).
+While in the folder of this repository, execute
 
-# Status
+```bash
+pip install -e .
+```
+
+Afterwards, you can launch the application via `libre-dictum`.
+
+## 3. Optional Features
+
+Execute the following commands to install depedencies for additional features:
+
+### systray
+Shows the currently enabled voice mode via a coloured circle in the systray.
+```bash
+pip install -e.[system-tray]
+```
+
+### transformer
+Enables support for arbitrary transformer models (each transformer model may have its own extra dependencies).
+```bash
+pip install -e.[transformer]
+```
+
+### openai-whisper
+Enables support for the openai-whisper model.
+```bash
+pip install -e.[whisper]
+```
+
+### all
+You can enable all optional features via
+```bash
+pip install -e.[all]
+```
+
+## Status
 
 In rapid development; config structure is updated often. Currently functional and satisfies many use cases.
