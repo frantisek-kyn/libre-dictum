@@ -74,7 +74,7 @@ def main():
                     model_path = value["path"], # Default Vosk local model directory
                     chunk_callback = callback
                 )
-        else:
+        elif value["type"] == "transformer":
             modes[key] = WhisperStream(
                     model_name = value["model_name"],
                     silence_seconds = value["silence_seconds"],

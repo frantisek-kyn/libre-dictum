@@ -3,17 +3,27 @@
 	"starting_mode": "root mode",
 	"enable_systray": true,
 	"modes": {
+		"::import test": {
+			"banned_strings": ["thank you"],
+			"aliases": {
+				"^write\\((.*)\\)$": "script(copy;;\\1) + ctrl + shift + v"
+			},
+			"commands": {
+				"open terminal": "alt + enter"
+			}
+		},
 		"root mode": {
 			"type": "vosk",
 			"path": "models/vosk-model-small-en-us-0.15",
 			"icon": [0, 255, 0],
 			"input_delay": 0.01,
+			"imports": ["::import test"],
 			"commands": {
-				"open terminal": "alt + enter",
 				"press {any}": "{1}",
 				"{numeric} times press {any} ": "{1}({2})",
 				"open firefox": "exec(firefox)",
-				"text command": "python(print('Test command.'))"
+				"text command": "python(print('Test command.'))",
+				"test plus": "write(\\+)"
 			}
 		},
 		"dictate mode": {
@@ -27,9 +37,7 @@
 			"lang": "en",
 			"input_delay": 0.01,
 			"transformer_device": "auto",
-			"aliases": {
-				"^write\\((.*)\\)$": "script(copy;;\\1) + ctrl + shift + v"
-			},
+			"imports": ["::import test"],
 			"commands": {
 				"{rest}": "write({1})"
 			}
