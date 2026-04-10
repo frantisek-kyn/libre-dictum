@@ -20,6 +20,8 @@ class Config:
         "aliases": {},
         "banned_strings": [],
         "input_delay": 0.01,
+        "enter_command": None,
+        "exit_command": None,
         "transformer": {
             "silence_seconds": 0.3,
             "max_chunk_seconds": 30.0,

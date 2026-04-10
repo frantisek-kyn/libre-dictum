@@ -45,9 +45,13 @@ def main():
             return
         if command_lower in modes:
             modes[active_mode].disable()
+            if cfg.modes[active_mode]["exit_command"]:
+                handle_input(cfg.modes[active_mode]["exit_command"], input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"])
             active_mode = command_lower
             if tray_enabled:
                 tray.set_mode(active_mode)
+            if cfg.modes[active_mode]["enter_command"]:
+                handle_input(cfg.modes[active_mode]["enter_command"], input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"])
             modes[active_mode].enable()
             return
         if command_lower in cfg.modes[active_mode]["banned_strings"]:
@@ -60,7 +64,7 @@ def main():
             regex = re.escape(pattern_clean)
             regex = regex.replace(r"\{numeric\}", r"(\d+)")
             regex = regex.replace(r"\{any\}", r"(\S+)")  # matches any non-space string
-            regex = regex.replace(r"\{rest\}", r"(.+)")  # matches any non-space string
+            regex = regex.replace(r"\{rest\}", r"(.+)")  # matches any string
             regex = "^" + regex + "$"
     
             match = re.fullmatch(regex, clean_command)
@@ -74,7 +78,7 @@ def main():
             modes[key] = VoskStream(
                     command_keys = expand_numeric_placeholders(list(value["commands"].keys())) + list(cfg.modes.keys()),
                     other_words = None,
-                    model_path = value["path"], # Default Vosk local model directory
+                    model_path = value["path"],
                     chunk_callback = callback
                 )
         elif value["type"] == "transformer":
