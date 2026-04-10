@@ -137,9 +137,23 @@ def handle_script(text):
     script_function(*arguments)
     return True
 
-combined_regex = re.compile(f"{script_regex}|{python_regex}|{exec_regex}", re.DOTALL)
+mode_regex = r"mode\((.*)\)"
 
-def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None):
+def handle_mode_change(text, callback):
+    if not callback:
+        return False
+
+    match = re.fullmatch(mode_regex, text, re.DOTALL)
+    if not match:
+        return False
+    captured = match.group(1)
+    callback(captured)
+    return True
+
+
+combined_regex = re.compile(f"{script_regex}|{python_regex}|{exec_regex}|{mode_regex}", re.DOTALL)
+
+def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mode_change_callback = None):
     text = apply_aliases(text, aliases)
     text = expand_repeats(text)
     data = [x.strip().replace(r"\+", "+") for x in re.split(r"(?<!\\)\+", text)]
@@ -150,10 +164,9 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None):
     if invalid_chars:
         warnings.warn(f"Invalid character(s) found: {', '.join(invalid_chars)}")
         return
-    #if not all(char.lower() in char_map or combined_regex.fullmatch(char) for char in data):
-    #    warnings.warn(f"")
-    #    return
     for char in data:
+        if handle_mode_change(char, mode_change_callback):
+            continue
         if handle_script(char):
             continue
         if handle_python(char):

@@ -31,6 +31,22 @@ def main():
     active_mode = cfg.starting_mode
     print(active_mode)
     modes = {}
+
+    def change_active_mode(mode_name):
+        global active_mode
+        if mode_name not in modes:
+            warnings.warn(f"Mode not found: {mode_name}. Skipping...")
+            return
+        modes[active_mode].disable()
+        if cfg.modes[active_mode]["exit_command"]:
+            handle_input(cfg.modes[active_mode]["exit_command"], input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"])
+        active_mode = mode_name
+        if tray_enabled:
+            tray.set_mode(active_mode)
+        if cfg.modes[active_mode]["enter_command"]:
+            handle_input(cfg.modes[active_mode]["enter_command"], input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"])
+        modes[active_mode].enable()
+
      
     def callback(text):
         global active_mode
@@ -44,15 +60,7 @@ def main():
             print("Config Reloaded")
             return
         if command_lower in modes:
-            modes[active_mode].disable()
-            if cfg.modes[active_mode]["exit_command"]:
-                handle_input(cfg.modes[active_mode]["exit_command"], input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"])
-            active_mode = command_lower
-            if tray_enabled:
-                tray.set_mode(active_mode)
-            if cfg.modes[active_mode]["enter_command"]:
-                handle_input(cfg.modes[active_mode]["enter_command"], input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"])
-            modes[active_mode].enable()
+            change_active_mode(command_lower)
             return
         if command_lower in cfg.modes[active_mode]["banned_strings"]:
             print(f"Skipping: '{text}' = '{command_lower}'")
@@ -71,7 +79,7 @@ def main():
             if match:
                 expanded_command = expand_command(response, match.groups())
                 print(f"Executing: {expanded_command}")
-                handle_input(expanded_command, input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"])
+                handle_input(expanded_command, input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"], mode_change_callback = change_active_mode)
                 return
     for key, value in cfg.modes.items():
         if value["type"] == "vosk":
