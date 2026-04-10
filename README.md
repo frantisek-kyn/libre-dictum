@@ -1,6 +1,9 @@
+
 # Overview
 
  A minimalist accessibility tool for GNU/Linux. It bridges local speech recognition with kernel-level input simulation. This bypasses limitations of specific window managers or desktop environments.
+ 
+https://github.com/user-attachments/assets/c7735d22-9583-4e38-a2c0-72d622a4153f
 
 ## Features
 
