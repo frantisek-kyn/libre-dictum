@@ -5,6 +5,8 @@ from typing import Any, Dict
 
 from pathlib import Path
 
+import json
+
 class Config:
     def __init__(self, path):
         self.path = path
@@ -29,6 +31,13 @@ class Config:
             "pre_roll_seconds": 0.25,
             "lang": "en",
             "transformer_device": "auto"
+        },
+        "head_tracking": {
+            "ht_dead_angle_v": 2.0,
+            "ht_dead_angle_h": 2.0,
+            "ht_speed_power": 1.0,
+            "ht_speed_mult": 1.0,
+            "ht_max_speed": 10
         }
     }
 
@@ -43,6 +52,11 @@ class Config:
                 # Special handling for transformer / vosk
                 if key in ("transformer", "vosk") and isinstance(value, dict):
                     if target_type == key:
+                        merge(target, value)
+                    continue
+                
+                if key == "head_tracking" and isinstance(value, dict):
+                    if target.get("ht_enabled") and self.enable_head_tracking:
                         merge(target, value)
                     continue
 
@@ -90,6 +104,17 @@ class Config:
         self.enable_systray = data.get("enable_systray", False)
         self.imports = []
         self.previous_mode_keyword = data.get("previous_mode_keyword", None)
+        self.enable_head_tracking = data.get("enable_head_tracking", False)
+        self.ht_min_detection_confidence = data.get("ht_min_detection_confidence", 0.5)
+        self.ht_min_tracking_confidence = data.get("ht_min_tracking_confidence", 0.5)
+        self.ht_offset_x = data.get("ht_offset_x", 0.0)
+        self.ht_offset_y = data.get("ht_offset_y", 0.0)
+
+        if self.enable_head_tracking:
+            self.ht_model_path = data.get("ht_model_path", None)
+            if not self.ht_model_path:
+                raise Exception(f"Path of model for head tracking is not set")
+            self.camera_index = data.get("camera_index", 0)
         for mode_name, mode in self.modes.items():
             self._append_imports(mode)
             mode.setdefault("type", "import")
@@ -105,5 +130,5 @@ class Config:
             if self.modes[key].get("type") == "import":
                 self.modes.pop(key)
                 self.imports.append(key)
-        
+        print(json.dumps(self.modes, indent=4))
         self.starting_mode = data.get("starting_mode", list(self.modes.keys())[0] if len(self.modes) > 0 else None)

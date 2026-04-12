@@ -195,6 +195,21 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
             time.sleep(input_delay)
     #ui.close()
 
+# Create a virtual mouse device
+mouse_capabilities = {
+    e.EV_REL: [e.REL_X, e.REL_Y],    
+    e.EV_KEY: [e.BTN_LEFT, e.BTN_RIGHT],
+
+}
+
+mouse_ui = UInput(mouse_capabilities, name="virtual-mouse")
+
+def handle_mouse_relative(dx, dy):
+    mouse_ui.write(e.EV_REL, e.REL_X, int(-dx))
+    mouse_ui.write(e.EV_REL, e.REL_Y, int(dy))
+    mouse_ui.syn()
+
+
 if __name__ == "__main__":
     time.sleep(1)
     handle_input("ctrl + V")

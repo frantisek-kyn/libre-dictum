@@ -41,33 +41,50 @@ pip install -e .
 
 Afterwards, you can launch the application via `libre-dictum`.
 
-### 3. Optional Features
+### 3 VOSK
+
+The main voice-control feature utilizes VOSK. You'll need to download the VOSK model from [VOSK website](https://alphacephei.com/vosk/models).
+The small vosk-model-small-en-us-0.15 model is enough for most use cases and is the one libre-dictum is tested on.
+
+### 4. Optional Features
 
 Execute the following commands to install depedencies for additional features:
 
 ### systray
 Shows the currently enabled voice mode via a coloured circle in the systray.
 ```bash
-pip install -e.[system-tray]
+pip install -e .[system-tray]
 ```
 
 ### transformer
 Enables support for arbitrary transformer models (each transformer model may have its own extra dependencies).
 ```bash
-pip install -e.[transformer]
+pip install -e .[transformer]
 ```
 
 ### openai-whisper
 Enables support for the openai-whisper model.
 ```bash
-pip install -e.[whisper]
+pip install -e .[whisper]
+```
+
+### head-tracking
+Enables relative mouse movement using head rotation from webcamera.
+```bash
+pip install -e .[head-tracking]
 ```
 
 ### all
 You can enable all optional features via
 ```bash
-pip install -e.[all]
+pip install -e .[all]
 ```
+
+### 5. Add Config
+
+The software must be configured to user's need using config file located at `~/.config/libre-dictum/config.json`Until documentation, explaining every setting in config.json, is written. Refer to [example configs](./examples/configs/) for inspiration.
+Without the configuration the software does nothing.
+
 
 ## Status
 

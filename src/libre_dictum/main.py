@@ -6,7 +6,7 @@ from .voskstream import VoskStream
 import json
 import re
 
-from .input_handler import handle_input, expand_command, replace_number_words, char_map, append_script_path
+from .input_handler import handle_input, handle_mouse_relative, expand_command, replace_number_words, char_map, append_script_path
 import pyperclip
 
 import sys
@@ -19,6 +19,8 @@ previous_mode = None
 from pathlib import Path
 
 import warnings
+
+from .abs_math import abs_add, abs_pow, abs_min
 
 def main():
     global active_mode
@@ -56,7 +58,30 @@ def main():
             handle_input(cfg.modes[active_mode]["enter_command"], input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"], mode_change_callback = change_active_mode)
         modes[active_mode].enable()
 
-     
+    def mouse_callback_relative(dx, dy):
+        if not cfg.modes[active_mode].get("ht_enabled"):
+            return
+        if dx == 0 and dy == 0:
+            return
+        if abs(dx) < cfg.modes[active_mode]["ht_dead_angle_h"]:
+            dx = 0
+        else:
+            dx = abs_add(dx, -cfg.modes[active_mode]["ht_dead_angle_h"])
+        if abs(dy) < cfg.modes[active_mode]["ht_dead_angle_v"]:
+            dy = 0
+        else:
+            dy = abs_add(dy, -cfg.modes[active_mode]["ht_dead_angle_v"])
+        
+        if dx == 0 and dy == 0:
+            return
+
+        dx = abs_pow(dx, cfg.modes[active_mode]["ht_speed_power"]) * cfg.modes[active_mode]["ht_speed_mult"]
+        dy = abs_pow(dy, cfg.modes[active_mode]["ht_speed_power"]) * cfg.modes[active_mode]["ht_speed_mult"]
+        dx = abs_min(dx, cfg.modes[active_mode]["ht_max_speed"])
+        dy = abs_min(dy, cfg.modes[active_mode]["ht_max_speed"])
+
+        handle_mouse_relative(-dx, dy)
+
     def callback(text):
         global active_mode
         print(f"Obtained: {text}")
@@ -110,6 +135,19 @@ def main():
                 )
         if tray_enabled:
             tray.add_mode(key, value["icon"])
+    if cfg.enable_head_tracking:
+        from .headtracking import FaceRotationTracker
+        head_tracking = FaceRotationTracker(
+                cfg.ht_model_path, 
+                callback = mouse_callback_relative,
+                camera_index = cfg.camera_index,
+                min_detection_confidence = cfg.ht_min_detection_confidence,
+                min_tracking_confidence = cfg.ht_min_tracking_confidence,
+                offset_x = cfg.ht_offset_x,
+                offset_y = cfg.ht_offset_y
+            )
+        head_tracking.start()
+
     #print(json.dumps(cfg.__dict__, indent=2))
     for mode in modes.values():
         mode.start()
