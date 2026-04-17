@@ -224,6 +224,7 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
 
             if holding:
                 keys_held.append(char)
+                modifiers_held.remove(key)
                 continue
 
             if char in modifier_keys:
@@ -239,11 +240,15 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
             continue
 
         if len(modifiers_held) != 0:
-            for hold_key in modifiers_held:
+            for hold_key in modifiers_held[:]:
                 ui.write(e.EV_KEY, hold_key, 0)
+                if key in modifiers_held:
+                    modifiers_held.remove(hold_key)
             ui.syn()
             time.sleep(input_delay)
     #ui.close()
+    print(f"Keys held: {keys_held}")
+    print(f"Modifiers held: {modifiers_held}")
 
 # Create a virtual mouse device
 mouse_capabilities = {
