@@ -45,6 +45,11 @@ char_map = {
     'space': e.KEY_SPACE
 }
 
+mouse_map = {
+    'left_mouse': e.BTN_LEFT, 
+    'right_mouse': e.BTN_RIGHT
+}
+
 modifier_keys = ["shift", "ctrl", "alt", "meta", "win"]
 
 modifiers_held = []
@@ -213,13 +218,20 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
                 holding = True
 
         char = char.lower()
-        key = char_map[char]
+        if char in char_map:
+            key = char_map[char]
+            target_ui = ui
+        elif char in mouse_map:
+            key = mouse_map[char]
+            target_ui = mouse_ui
+        else:
+            raise Exception(f"Unknown key {key}")
 
         if not release:
             if char in keys_held:
                 continue
-            ui.write(e.EV_KEY, key, 1)
-            ui.syn()
+            target_ui.write(e.EV_KEY, key, 1)
+            target_ui.syn()
             time.sleep(input_delay)
 
             if holding:
@@ -232,8 +244,8 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
                 modifiers_held.append(key)
                 continue
         
-        ui.write(e.EV_KEY, key, 0)
-        ui.syn()
+        target_ui.write(e.EV_KEY, key, 0)
+        target_ui.syn()
         time.sleep(input_delay)
 
         if release:
@@ -242,9 +254,9 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
 
         if len(modifiers_held) != 0:
             for hold_key in modifiers_held[:]:
-                ui.write(e.EV_KEY, hold_key, 0)
+                target_ui.write(e.EV_KEY, hold_key, 0)
                 modifiers_held.remove(hold_key)
-            ui.syn()
+            target_ui.syn()
             time.sleep(input_delay)
 
 # Create a virtual mouse device
