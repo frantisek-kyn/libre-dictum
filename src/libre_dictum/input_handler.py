@@ -8,6 +8,8 @@ import warnings
 
 import sys
 
+from typing import Iterable
+
 char_map = {
     # Alphabet
     'a': e.KEY_A, 'b': e.KEY_B, 'c': e.KEY_C, 'd': e.KEY_D,
@@ -56,18 +58,30 @@ modifiers_held = []
 
 keys_held = []
 
-def expand_command(response_template, values):
-    """
-    Replaces placeholders {1}, {2}, ... in response_template with corresponding values.
-    
-    :param response_template: str, e.g., "a + {1} + {2}"
-    :param values: tuple/list of str, e.g., ("9", "5")
-    :return: str with placeholders replaced, e.g., "a + 9 + 5"
-    """
-    result = response_template
-    for i, value in enumerate(values, start=1):
-        result = result.replace(f"{{{i}}}", value)
-    return result
+variables_saved = []
+
+_PLACEHOLDER_RE = re.compile(r"\{(\d+)(?:=([^{}]*))?\}")
+
+def expand_command(response_template: str, values: Iterable[str], apply_defaults: bool = False) -> str:
+    values = list(values)
+    n_values = len(values)
+
+    def repl(match: re.Match[str]) -> str:
+        index = int(match.group(1))
+        default = match.group(2)
+
+        if index <= n_values:
+            return values[index - 1]
+
+        if apply_defaults:
+            return default if default is not None else ""
+
+        new_index = index - n_values
+        if default is not None:
+            return f"{{{new_index}={default}}}"
+        return f"{{{new_index}}}"
+
+    return _PLACEHOLDER_RE.sub(repl, response_template)
 
 def apply_aliases(text, aliases):
     result = text
@@ -184,10 +198,22 @@ def handle_toggle(text):
     captured = match.group(1)
     return (True, captured in keys_held, captured)
 
-combined_regex = re.compile(f"{script_regex}|{python_regex}|{exec_regex}|{mode_regex}|{hold_regex}|{release_regex}|{toggle_regex}", re.DOTALL)
+save_regex = r"save\((.*)\)"
+
+def handle_save(text):
+    match = re.fullmatch(save_regex, text, re.DOTALL)
+    if not match:
+        return False
+    captured = match.group(1)
+    variables_saved.append(captured)
+    return True
+
+combined_regex = re.compile(f"{script_regex}|{python_regex}|{exec_regex}|{mode_regex}|{hold_regex}|{release_regex}|{toggle_regex}|{save_regex}", re.DOTALL)
 
 def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mode_change_callback = None):
     text = apply_aliases(text, aliases)
+    text = expand_command(text, variables_saved, apply_defaults = True)
+    print(text)
     text = expand_repeats(text)
     data = [x.strip().replace(r"\+", "+") for x in re.split(r"(?<!\\)\+", text)]
     invalid_chars = [
@@ -206,6 +232,10 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
             continue
         if handle_exec(char):
             continue
+        if handle_save(char):
+            continue
+        else: 
+            variables_saved.clear()
 
         holding, char = handle_hold(char)
         release, char = handle_release(char)
@@ -225,7 +255,7 @@ def handle_input(text, input_delay = 0.01, aliases = {}, script_path = None, mod
             key = mouse_map[char]
             target_ui = mouse_ui
         else:
-            raise Exception(f"Unknown key {key}")
+            raise Exception(f"Unknown key {char}")
 
         if not release:
             if char in keys_held:
