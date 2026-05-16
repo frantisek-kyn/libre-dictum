@@ -102,11 +102,10 @@ def main():
         for pattern, response in cfg.modes[active_mode]["commands"].items():
             pattern_clean = re.sub(r'[?.!;:]', '', pattern.lower().strip())
     
-            # Replace {numeric} with (\d+), {any} with (\S+)
             regex = re.escape(pattern_clean)
             regex = regex.replace(r"\{numeric\}", r"(\d+)")
-            regex = regex.replace(r"\{any\}", r"(\S+)")  # matches any non-space string
-            regex = regex.replace(r"\{rest\}", r"(.+)")  # matches any string
+            regex = regex.replace(r"\{any\}", r"(\S+)")
+            regex = regex.replace(r"\{rest\}", r"(.+)")
             regex = "^" + regex + "$"
     
             match = re.fullmatch(regex, clean_command)
@@ -115,6 +114,7 @@ def main():
                 print(f"Executing: {expanded_command}")
                 handle_input(expanded_command, input_delay = cfg.modes[active_mode]["input_delay"], aliases = cfg.modes[active_mode]["aliases"], mode_change_callback = change_active_mode)
                 return
+                
     for key, value in cfg.modes.items():
         if value["type"] == "vosk":
             modes[key] = VoskStream(
@@ -135,8 +135,23 @@ def main():
                 )
         if tray_enabled:
             tray.add_mode(key, value["icon"])
+            
     if cfg.enable_head_tracking:
         from .headtracking import FaceRotationTracker
+
+        def head_gesture_callback(gesture_name):
+            mode_gestures = cfg.modes[active_mode].get("gestures", {})
+            action = mode_gestures.get(gesture_name)
+            
+            if action:
+                print(f"Executing gesture action for {gesture_name}: {action}")
+                handle_input(
+                    action, 
+                    input_delay=cfg.modes[active_mode].get("input_delay", 0.01), 
+                    aliases=cfg.modes[active_mode].get("aliases", {}), 
+                    mode_change_callback=change_active_mode
+                )
+
         head_tracking = FaceRotationTracker(
                 cfg.ht_model_path, 
                 callback = mouse_callback_relative,
@@ -144,11 +159,12 @@ def main():
                 min_detection_confidence = cfg.ht_min_detection_confidence,
                 min_tracking_confidence = cfg.ht_min_tracking_confidence,
                 offset_x = cfg.ht_offset_x,
-                offset_y = cfg.ht_offset_y
+                offset_y = cfg.ht_offset_y,
+                gesture_callback = head_gesture_callback,
+                gesture_definitions = cfg.ht_custom_gestures
             )
-        head_tracking.start()
-
-    #print(json.dumps(cfg.__dict__, indent=2))
+        head_tracking.start()    
+    
     for mode in modes.values():
         mode.start()
     if active_mode:
