@@ -12,6 +12,7 @@ https://github.com/user-attachments/assets/c7735d22-9583-4e38-a2c0-72d622a4153f
 * **Hybrid Transcription**: Utilizes the VOSK models with grammar based on your commands and transformer models for dictation.
 * **Mode Switching**: You can switch between different configs on the fly via a voice command.
 * **Configurability**: Command structure is fully customizable.
+* **Gesture Recognition**: You can define custom gestures and trigger logic.
 * **System Tray**: Provides live feedback on the current enabled voice mode.
 * **Script Execution**: You can execute your own scripts via voice commands.
 
@@ -93,4 +94,4 @@ Without the configuration the software does nothing.
 
 ## Status
 
-In rapid development; config structure is updated often. Currently functional and satisfies many use cases.
+In rapid development; config structure is updated often. Currently functional and satisfies many use cases. There is a major bug with choosing proper webcam settings. Currently, the code in `src/headtracking.py` enforces defaults that may not be compatible with some webcams. This will be looked into soon. 
